@@ -9,19 +9,25 @@ Player :: struct {
     speed: f32,
     size:rl.Vector2,
     color: rl.Color,
+    texture: rl.Texture2D,
 }
 
-createPlayer :: proc() -> Player {
+createPlayer :: proc(playerImg: rl.Texture2D) -> Player {
     return Player {
         pos   = rl.Vector2 {640, 320},
         speed = 400.0,
         size  = rl.Vector2 {64, 64},
         color = rl.GREEN,
+        texture = playerImg
     }
 }
 
-drawPlayer::proc(p: ^Player) {
-    rl.DrawRectangleV(p.pos, p.size, p.color)
+drawPlayer::proc(p: Player) {
+    source_rec := rl.Rectangle{0, 0, f32(p.texture.width), f32(p.texture.height)}
+    dest_rec   := rl.Rectangle{p.pos.x, p.pos.y, p.size.x, p.size.y}
+    origin     := rl.Vector2{0, 0} 
+    rotation   := f32(10.0)
+    rl.DrawTexturePro(p.texture, source_rec, dest_rec, origin, rotation, p.color)
 }
 
 movePlayer::proc(p: ^Player, dt: f32) {

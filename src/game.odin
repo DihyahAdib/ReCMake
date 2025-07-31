@@ -6,41 +6,58 @@ import u "utils"
 
 initWindowSetup :: proc() {
     rl.SetConfigFlags({.WINDOW_RESIZABLE})
-    rl.InitWindow(u.ScreenWidth, u.ScreenHeight, "ReMake")
+    rl.InitWindow(u.screenWidth, u.screenHeight, "ReMake")
     rl.SetTargetFPS(120)
 }
 
-update::proc(player: ^Player, dt: f32) {
-    movePlayer(player, dt)
-    playerCollisionCheck(player)
+initGameAssets::proc() -> (Player, Enemy) {
+    playerTexture := rl.LoadTexture("src/assets/sword.png")
+    enemyTexture := rl.LoadTexture("src/assets/SmirkDude.png")
+
+        if enemyTexture.id == 0 {
+        fmt.println("ERROR: Failed to load enemy texture! Check path and file: src/assets/SmirkDude.png")
+    } else {
+        fmt.println("Enemy texture loaded successfully! ID:", enemyTexture.id, " Size:", enemyTexture.width, "x", enemyTexture.height)
+    }
+
+    playerInstance := createPlayer(playerTexture)
+    enemyInstance := createEnemy(enemyTexture)
+
+    return playerInstance, enemyInstance
 }
 
-drawGameElement::proc(player: Player) {
-    rl.ClearBackground(rl.WHITE)
-    drawPlayer(player)
+update::proc(p: ^Player, e:^Enemy, dt: f32) {
+    movePlayer(p, dt)
+    playerCollisionCheck(p)
+    enemyCollisionCheck(e)
+}
+
+drawGameObjects::proc(p: Player, e: Enemy) {
+    rl.ClearBackground({110, 184, 168, 255})
+    drawPlayer(p)
+    drawEnemy(e)
     rl.DrawFPS(220, 5)
 }
 
+
 main::proc() {
     initWindowSetup()
-
-    playerTexture := rl.LoadTexture("src/assets/sword.png")
-    if playerTexture.id == 0 {
-    fmt.println("ERROR: Failed to load player texture! Check path and file.")
-    } else {
-        fmt.println("Player texture loaded successfully! ID:", playerTexture.id, " Size:", playerTexture.width, "x", playerTexture.height)
-    }
-    playerInstance := createPlayer(playerTexture)
+    playerInstance, enemyInstance := initGameAssets()
 
     for !rl.WindowShouldClose() {
         dt := rl.GetFrameTime()
 
-        update(&playerInstance, dt)
+        update(&playerInstance, &enemyInstance, dt)
 
         rl.BeginDrawing()
-            drawGameElement(playerInstance)
+            drawGameObjects(playerInstance, enemyInstance)
         rl.EndDrawing()
     }
-    rl.UnloadTexture(playerTexture)
+    unloadAllTextures(playerInstance, enemyInstance)
     rl.CloseWindow()
+}
+
+unloadAllTextures::proc(p: Player , e: Enemy) {
+    rl.UnloadTexture(p.texture)
+    rl.UnloadTexture(e.texture)
 }

@@ -1,7 +1,22 @@
 package utils
 
 import rl "vendor:raylib"
-ScreenWidth :: 1280
-ScreenHeight :: 720
-// winCenterX :: rl.GetCurrentWidth() / 2
-// winCenterY :: rl.GetCurrentHeight() / 2
+
+screenWidth :: 1280
+screenHeight :: 720
+
+GetCurrentScreenWidth :: proc() -> f32 {
+    return f32(rl.GetScreenWidth())
+}
+
+GetCurrentScreenHeight :: proc() -> f32 {
+    return f32(rl.GetScreenHeight())
+}
+
+GetWinCenterX :: proc() -> f32 {
+    return f32(rl.GetScreenWidth()) / 2.0
+}
+
+GetWinCenterY :: proc() -> f32 {
+    return f32(rl.GetScreenHeight()) / 2.0
+}
